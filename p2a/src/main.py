@@ -56,6 +56,8 @@ import tello
 import frame_utils as frame
 import rendering
 import usercode
+import create_env
+import rrt_star
 
 # Force reload custom modules and run the latest code
 importlib.reload(control)
@@ -74,6 +76,10 @@ def main():
 
     # STOP time for simulation
     sim_stop_time = 15
+    
+    
+    #env file path 
+    filepath = "/home/ssuryalolla/Aerial_Robotics/slolla_p2a/src/sample_maps/map4.txt"
 
     # INIT RENDERING AND CONTROL
     controller = control.quad_control()
@@ -106,6 +112,17 @@ def main():
     stateArray = current_ned_state
     timeArray = 0
     controlArray = np.array([0., 0, 0, 0])
+    
+    envi = create_env.Environment(filepath)
+    envi.make_env()    
+    
+    map_array_scale = envi.get_map_array_scale()
+    print(map_array_scale)
+    start = [5*map_array_scale,16*map_array_scale,3*map_array_scale]
+    goal = [24*map_array_scale,16*map_array_scale,3*map_array_scale]
+    rrt_st = rrt_star.RRT(envi,start,goal)
+    path = rrt_st.RRT_star()
+    envi.visualize_nodes(path) 
 
     # SCHEDULER SUPER LOOP
     # --------------------------------------------------------------------------------------------

@@ -3,6 +3,7 @@ import math
 from pyquaternion import Quaternion
 from numpy.linalg import norm
 import scipy
+from scipy import io
 
 class quad_control:
     def __init__(self):
@@ -174,7 +175,8 @@ class quad_control:
         loggedDict = {'control_time': self.timeArray,
                   'control_premix': self.controlArray}
         
-        scipy.io.savemat('./log/control.mat', loggedDict)
+        # scipy.io.savemat('./log/control.mat', loggedDict)
+        io.savemat('./log/control.mat', loggedDict)
 
 
         return U
