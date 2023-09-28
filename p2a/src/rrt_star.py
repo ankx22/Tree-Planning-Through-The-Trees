@@ -243,7 +243,7 @@ class RRT:
 
 
 
-    def RRT_star(self, n_pts=1000, neighbor_size=20): 
+    def RRT_star(self, n_pts=15000, neighbor_size=20): 
         #if not seeing desired results correct the parameters: delta_q_star, goal_tolerance, best_dist threshold, neighbor_size, goal_tolerance, goal probability of self.get_new_point
         '''RRT* search function
         arguments:
@@ -270,17 +270,17 @@ class RRT:
 
         for sample_number in range(n_pts):
 
-            random_sample = self.get_new_point(0.005) #get a new point 
+            random_sample = self.get_new_point(0.01) #get a new point 
             random_node = Node(random_sample[0],random_sample[1],random_sample[2]) #create a node for the random sample generated 
 
-
-            delta_q_star = 400 #setting the incremental distance for moving from nearest vertex to random vertex (steering)
-            goal_tolerance = 300 #a node within this distance is considered close enough to the goal 
+            print(sample_number)
+            delta_q_star = 100 #setting the incremental distance for moving from nearest vertex to random vertex (steering)
+            goal_tolerance = 50 #a node within this distance is considered close enough to the goal 
             
             nearest_node,best_dist = self.get_nearest_node(random_sample) #get its nearest node to the random sample in the existing tree 
             # print(best_dist)
-            while best_dist <= 100:
-                random_sample = self.get_new_point(0.005) #get a new point 
+            while best_dist <= 50:
+                random_sample = self.get_new_point(0.01) #get a new point 
                 nearest_node,best_dist = self.get_nearest_node(random_sample) #get its nearest node
             
 
@@ -293,7 +293,7 @@ class RRT:
 
             if(self.map_array[sample_node.x][sample_node.y][sample_node.z] == 0 or self.map_array[sample_node.x][sample_node.y][sample_node.z] == 2): continue #if the sample is in an obstacle or self.vertices
 
-            neighbor_size = 500 
+            neighbor_size = 200 
             neighbors = self.get_neighbors(sample_node,neighbor_size)
             if(not neighbors): continue 
             #get the node with the least cost in the neighbors found 
