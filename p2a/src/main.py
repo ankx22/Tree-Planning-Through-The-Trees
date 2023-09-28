@@ -79,7 +79,7 @@ def main():
     
     
     #env file path 
-    filepath = "/home/ssuryalolla/Aerial_Robotics/slolla_p2a/src/sample_maps/map4.txt"
+    filepath = "/home/ssuryalolla/Tree-Planning-Through-The-Trees/p2a/src/sample_maps/map4.txt"
 
     # INIT RENDERING AND CONTROL
     controller = control.quad_control()
