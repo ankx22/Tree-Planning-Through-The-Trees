@@ -243,107 +243,141 @@ class RRT:
 
 
 
-    def RRT_star(self, n_pts=15000, neighbor_size=20): 
-        #if not seeing desired results correct the parameters: delta_q_star, goal_tolerance, best_dist threshold, neighbor_size, goal_tolerance, goal probability of self.get_new_point
-        '''RRT* search function
-        arguments:
-            n_pts - number of points try to sample, 
-                    not the number of final sampled points
-            neighbor_size - the neighbor distance
+    # def cubic_spline_interpolation(self, node1, node2, t):
+    #     # Compute the coefficients for the cubic spline equation
+    #     A = -2 * node1 + 2 * node2
+    #     B = 3 * node1 - 3 * node2
+    #     D = node1
         
-        In each step, extend a new node if possible, and rewire the node and its neighbors
-        '''
-        # Remove previous result
-        self.init_map()
+    #     return A * (t ** 3) + B * (t ** 2) + D
 
-        print(self.start)
-        print(self.goal)
+    # def interpolate_path(self, path, num_points=10):
+    #     spline_path = []
+    #     for i in range(len(path) - 1):
+    #         start_node = path[i]
+    #         end_node = path[i + 1]
 
-        ### YOUR CODE HERE ###
+    #         spline_path.append(start_node)
 
-        # In each step,
-        # get a new point, 
-        # get its nearest node, 
-        # extend the node and check ylision to decide whether to add or drop,
-        # if added, rewire the node and its neighbors,
-        # and check if reach the neighbor region of the goal if the path is not found.
+    #         for j in range(1, num_points + 1):
+    #             t = j / (num_points + 1)
+    #             x = self.cubic_spline_interpolation(start_node.x, end_node.x, t)
+    #             y = self.cubic_spline_interpolation(start_node.y, end_node.y, t)
+    #             z = self.cubic_spline_interpolation(start_node.z, end_node.z, t)
 
-        for sample_number in range(n_pts):
+    #             interpolated_node = Node(x, y, z)
+    #             spline_path.append(interpolated_node)
 
-            random_sample = self.get_new_point(0.01) #get a new point 
-            random_node = Node(random_sample[0],random_sample[1],random_sample[2]) #create a node for the random sample generated 
+    #     spline_path.append(path[-1])
+    #     return spline_path
 
-            print(sample_number)
-            delta_q_star = 100 #setting the incremental distance for moving from nearest vertex to random vertex (steering)
-            goal_tolerance = 50 #a node within this distance is considered close enough to the goal 
+    def RRT_star(self, n_pts=15000, neighbor_size=20): 
+            #if not seeing desired results correct the parameters: delta_q_star, goal_tolerance, best_dist threshold, neighbor_size, goal_tolerance, goal probability of self.get_new_point
+            '''RRT* search function
+            arguments:
+                n_pts - number of points try to sample, 
+                        not the number of final sampled points
+                neighbor_size - the neighbor distance
             
-            nearest_node,best_dist = self.get_nearest_node(random_sample) #get its nearest node to the random sample in the existing tree 
-            # print(best_dist)
-            while best_dist <= 50:
+            In each step, extend a new node if possible, and rewire the node and its neighbors
+            '''
+            # Remove previous result
+            self.init_map()
+
+            # print(self.start)
+            # print(self.goal)
+
+            ### YOUR CODE HERE ###
+
+            # In each step,
+            # get a new point, 
+            # get its nearest node, 
+            # extend the node and check ylision to decide whether to add or drop,
+            # if added, rewire the node and its neighbors,
+            # and check if reach the neighbor region of the goal if the path is not found.
+
+            # for sample_number in range(n_pts):
+            while not self.found:
+
                 random_sample = self.get_new_point(0.01) #get a new point 
-                nearest_node,best_dist = self.get_nearest_node(random_sample) #get its nearest node
-            
+                random_node = Node(random_sample[0],random_sample[1],random_sample[2]) #create a node for the random sample generated 
 
-            sample_node = self.steer(random_node,nearest_node,delta_q_star) #steer towards the random node and return the corresponding node
+                # print(sample_number)
+                delta_q_star = 100 #setting the incremental distance for moving from nearest vertex to random vertex (steering)
+                goal_tolerance = 50 #a node within this distance is considered close enough to the goal 
+                
+                nearest_node,best_dist = self.get_nearest_node(random_sample) #get its nearest node to the random sample in the existing tree 
+                # print(best_dist)
+                while best_dist <= 50:
+                    random_sample = self.get_new_point(0.01) #get a new point 
+                    nearest_node,best_dist = self.get_nearest_node(random_sample) #get its nearest node
+                
 
-            # print(sample_node)
+                sample_node = self.steer(random_node,nearest_node,delta_q_star) #steer towards the random node and return the corresponding node
 
-            # for i in self.vertices: print(i)
-            # print("\n")
+                # print(sample_node)
 
-            if(self.map_array[sample_node.x][sample_node.y][sample_node.z] == 0 or self.map_array[sample_node.x][sample_node.y][sample_node.z] == 2): continue #if the sample is in an obstacle or self.vertices
+                # for i in self.vertices: print(i)
+                # print("\n")
 
-            neighbor_size = 200 
-            neighbors = self.get_neighbors(sample_node,neighbor_size)
-            if(not neighbors): continue 
-            #get the node with the least cost in the neighbors found 
-            best_neighbor = neighbors[0]
-            best_neighbor_cost = best_neighbor.cost  
-            for neighbor in neighbors: #TODO: put collision check inside this loop to get a node for sure that has no collision 
-                if(neighbor.cost<best_neighbor_cost):
-                    best_neighbor_cost = neighbor.cost
-                    best_neighbor = neighbor
-            
-            if(self.check_collision(sample_node,best_neighbor)): #if the line between the sample node and nearest node has no obstacle 
-                sample_node.parent = best_neighbor #update the parent
-                sample_node.cost = best_neighbor.cost + self.dis(sample_node,best_neighbor) #update cost 
+                if(self.map_array[sample_node.x][sample_node.y][sample_node.z] == 0 or self.map_array[sample_node.x][sample_node.y][sample_node.z] == 2): continue #if the sample is in an obstacle or self.vertices
+
+                neighbor_size = 200 
+                neighbors = self.get_neighbors(sample_node,neighbor_size)
+                if(not neighbors): continue 
+                #get the node with the least cost in the neighbors found 
+                best_neighbor = neighbors[0]
+                best_neighbor_cost = best_neighbor.cost  
+                for neighbor in neighbors: #TODO: put collision check and distance metric inside this loop to get a node for sure that has no collision 
+                    if neighbor.cost + self.dis(sample_node, neighbor) < best_neighbor_cost + self.dis(sample_node, best_neighbor) and self.check_collision(sample_node,best_neighbor):
+                        best_neighbor_cost = neighbor.cost
+                        best_neighbor = neighbor
+                if(self.check_collision(sample_node,best_neighbor)): #if the line between the sample node and nearest node has no obstacle 
+                    sample_node.parent = best_neighbor #update the parent
+                    sample_node.cost = best_neighbor.cost + self.dis(sample_node,best_neighbor) #update cost 
+                else:
+                    continue
                 self.rewire(sample_node,neighbors)
                 self.vertices.append(sample_node) #add sample node to list of vertices 
                 self.map_array[sample_node.x][sample_node.y][sample_node.z] = 2 #if a node is added to self.vertices, its corresponding val in map_array will be 2
                 # print(sample_node)
                 
-                if(self.dis(sample_node,self.goal)< goal_tolerance): #if sample node is close enough to goal 
+                if(self.dis(sample_node,self.goal)< goal_tolerance and (not self.found)): #if sample node is close enough to goal  and (not self.found)
                     self.found = True 
                     self.goal.parent = sample_node #update goal parent 
                     self.goal.cost = sample_node.cost + self.dis(sample_node,self.goal) #update goal cost 
+                    self.vertices.append(self.goal)#ADDED THIS LINE
+                    self.map_array[self.goal.x][self.goal.y][self.goal.z] = 2
                     #keep iterating and optimizing the current path even after goal is found in RRT*
 
-        
-        path = []
-
-        # Output
-        if self.found:
-            self.vertices.append(self.goal) #add goal to vertices list after the desired number of iterations 
-            self.map_array[self.goal.x][self.goal.y][self.goal.z] = 2
-            steps = len(self.vertices) - 2
-            length = self.goal.cost
-            # for i in self.vertices: print(i)
-            # print("\n")
-            print("It took %d nodes to find the current path" %steps)
-            print("The path length is %.2f" %length)
-
-            current_node = self.goal
-            while current_node is not None:  # Traverse from the goal node to the start node
-                path.append(current_node)
-                current_node = current_node.parent  # move to the parent node
             
-            path.reverse()  # Reverse the list to print from start to goal
-            for node in path:
-                print(node)  
-            
-            return path 
-            
-        else:
-            print("No path found")
-            return path 
+            path = []
 
+            # Output
+            if self.found:
+                # self.vertices.append(self.goal)#ADDED THIS LINE
+                # self.map_array[self.goal.x][self.goal.y][self.goal.z] = 2
+                # self.vertices.append(self.goal) #add goal to vertices list after the desired number of iterations 
+                steps = len(self.vertices) - 2
+                length = self.goal.cost
+                # for i in self.vertices: print(i)
+                # print("\n")
+                # print("It took %d nodes to find the current path" %steps)
+                # print("The path length is %.2f" %length)
+
+                current_node = self.goal
+                while current_node is not None:  # Traverse from the goal node to the start node
+                    path.append(current_node)
+                    current_node = current_node.parent  # move to the parent node
+                
+                path.reverse()  # Reverse the list to print from start to goal
+                # for node in path:
+                #     # print(node)  
+                
+                return path 
+                # path_interpolated = self.interpolate_path(path)
+                # return path_interpolated
+                
+            else:
+                print("No path found")
+                return path

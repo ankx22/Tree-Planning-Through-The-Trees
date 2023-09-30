@@ -13,7 +13,7 @@ class Environment:
             with open(self.filepath, 'r') as f:
                 content = f.read()
         except FileNotFoundError:
-            print("Error: File not found!")
+            # print("Error: File not found!")
             return
         
         # Process the content
@@ -26,9 +26,10 @@ class Environment:
                     boundary = [float(i) for i in words[1:7]]
                     
                     # Create the boundary cube
-                    bpy.ops.mesh.primitive_cube_add(size=1, location=(boundary[0] + boundary[3] / 2, 
-                                                                    boundary[1] + boundary[4] / 2, 
-                                                                    boundary[2] + boundary[5] / 2))
+                    bpy.ops.mesh.primitive_cube_add(size=1, location=((boundary[0] + boundary[3]) / 2, 
+                                                (boundary[1] + boundary[4]) / 2, 
+                                                (boundary[2] + boundary[5]) / 2))
+
                     boundary_cube = bpy.context.object
                     boundary_cube.dimensions = [boundary[3] - boundary[0], boundary[4] - boundary[1], boundary[5] - boundary[2]]
                     
@@ -50,7 +51,7 @@ class Environment:
 
                     max_x, max_y, max_z = int(boundary[3]), int(boundary[4]), int(boundary[5])
                     self.map_array = np.ones((self.map_array_scale*max_x, self.map_array_scale*max_y, self.map_array_scale*max_z), dtype=np.uint8)  # 1 denotes free space
-                    print("boundary indices: ",self.map_array_scale*max_x, self.map_array_scale*max_y, self.map_array_scale*max_z)
+                    # print("boundary indices: ",self.map_array_scale*max_x, self.map_array_scale*max_y, self.map_array_scale*max_z)
                     
                 elif words[0] == 'block':
                     block_coords = [float(i) for i in words[1:7]]
@@ -86,7 +87,7 @@ class Environment:
                     x_start, y_start, z_start, x_end, y_end, z_end = map(int, bloated_coords)
                     self.map_array[self.map_array_scale*x_start:self.map_array_scale*x_end, self.map_array_scale*y_start:self.map_array_scale*y_end, self.map_array_scale*z_start:self.map_array_scale*z_end] = 0  # 0 denotes obstacles
 
-                    print("block indices: ",self.map_array_scale*x_start,self.map_array_scale*x_end, self.map_array_scale*y_start,self.map_array_scale*y_end, self.map_array_scale*z_start,self.map_array_scale*z_end)
+                    # print("block indices: ",self.map_array_scale*x_start,self.map_array_scale*x_end, self.map_array_scale*y_start,self.map_array_scale*y_end, self.map_array_scale*z_start,self.map_array_scale*z_end)
 
                     # Create the block with bloated dimensions and adjusted location
                     bpy.ops.mesh.primitive_cube_add(size=1, location=bloated_location)

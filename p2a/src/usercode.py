@@ -3,6 +3,7 @@ import cv2
 import bpy
 import os
 import scipy
+import matplotlib.pyplot as plt
 
 class state_machine:
     def __init__(self):
@@ -12,10 +13,86 @@ class state_machine:
         ### Motion Profile - sample code - EDIT HERE! ######################################################
         # For tuning the PID, utilize the following code. Once tuned, modify this section as you want! 
         self.MP = np.genfromtxt('./src/sample_traj/MP.csv', delimiter=',', skip_header=0)
-        print(self.MP.shape)
+        # print(self.MP.shape)
         self.activeIndex = 0
         ####################################################################################################
+        userstates = scipy.io.loadmat('./log/user_states.mat')
+        t = userstates['time']
+        x = userstates['x']
+        y = userstates['y']
+        z = userstates['z']
+        xdes = userstates['x_des']
+        ydes = userstates['y_des']
+        zdes = userstates['z_des']
+        vx = userstates['vx']
+        vy = userstates['vy']
+        vz = userstates['vz']
+        vxdes = userstates['vx_des']
+        vydes = userstates['vy_des']
+        vzdes = userstates['vz_des']
+        # fig1 = plt.figure()
+        # ax = plt.axes(projection ='3d')
+        # # ax.plot3D(self.MP[0, :], self.MP[1, :],self.MP[2, :], 'green')
+        # ax.plot3D(xdes, ydes,zdes, 'green',label='desired')
+        # ax.plot3D(x,y,z,'red',label='actual')
+        # ax.set_title('3D trajectory visualization')
+        # ax.legend(loc='upper right')
+        # ax.grid(True)
+        # plt.show()
+        #-------------------
+        fig2, axs = plt.subplots(2, 3, figsize=(15, 8))
 
+        # Plot the data in each subplot
+        axs[0, 0].plot(t,xdes,label='xdes')
+        axs[0, 0].plot(t,x,label='x')
+        axs[0, 0].set_title('Position X')
+        axs[0, 0].set_ylabel('X (m)')
+        axs[0, 0].set_xlabel('time (s)')
+        axs[0, 0].legend(loc='upper right')
+        axs[0, 0].grid(True)
+        axs[0, 1].plot(t,ydes,label='ydes')
+        axs[0, 1].plot(t,y,label='y')
+        axs[0, 1].set_title('Position Y')
+        axs[0, 1].set_ylabel('Y (m)')
+        axs[0, 1].set_xlabel('time (s)')
+        axs[0, 1].legend(loc='upper right')
+        axs[0, 1].grid(True)
+        axs[0, 2].plot(t,zdes,label='zdes')
+        axs[0, 2].plot(t,z,label='z')
+        axs[0, 2].set_title('Position Z')
+        axs[0, 2].set_ylabel('Z (m)')
+        axs[0, 2].set_xlabel('time (s)')
+        axs[0, 2].legend(loc='upper right')
+        axs[0, 2].grid(True)
+        axs[1, 0].plot(t,vxdes,label='vxdes')
+        axs[1, 0].plot(t,vx,label='vx')
+        axs[1, 0].set_title('Velcoity X')
+        axs[1, 0].set_ylabel('Vx (m/s)')
+        axs[1, 0].set_xlabel('time (s)')
+        axs[1, 0].legend(loc='upper right')
+        axs[1, 0].grid(True)
+        axs[1, 1].plot(t,vydes,label='vydes')
+        axs[1, 1].plot(t,vy,label='vy')
+        axs[1, 1].set_title('Velcoity Y')
+        axs[1, 1].set_ylabel('Vy (m/s)')
+        axs[1, 1].set_xlabel('time (s)')
+        axs[1, 1].legend(loc='upper right')
+        axs[1, 1].grid(True)
+        axs[1, 2].plot(t,vzdes,label='vzdes')
+        axs[1, 2].plot(t,vz,label='vz')
+        axs[1, 2].set_title('Velcoity Z')
+        axs[1, 2].set_ylabel('Vz (m/s)')
+        axs[1, 2].set_xlabel('time (s)')
+        axs[1,2].legend(loc='upper right')
+        axs[1, 2].grid(True)
+        
+        # Adjust layout
+        plt.tight_layout()
+        # Show the plot
+        plt.show()
+
+
+        ####################################################################################################
 
         # Logger
         self.time_array = 0

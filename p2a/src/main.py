@@ -79,7 +79,7 @@ def main():
     
     
     #env file path 
-    filepath = "/home/ssuryalolla/Tree-Planning-Through-The-Trees/p2a/src/sample_maps/map4.txt"
+    filepath = "./src/sample_maps/map4.txt"
 
     # INIT RENDERING AND CONTROL
     controller = control.quad_control()
@@ -117,9 +117,9 @@ def main():
     envi.make_env()    
     
     map_array_scale = envi.get_map_array_scale()
-    print(map_array_scale)
-    start = [5*map_array_scale,16*map_array_scale,3*map_array_scale]
-    goal = [24*map_array_scale,16*map_array_scale,3*map_array_scale]
+    # print(map_array_scale)
+    start = [5*map_array_scale,13*map_array_scale,3*map_array_scale]
+    goal = [5*map_array_scale,7.5*map_array_scale,3*map_array_scale]
     rrt_st = rrt_star.RRT(envi,start,goal)
     path = rrt_st.RRT_star()
     envi.visualize_nodes(path) 
