@@ -79,7 +79,7 @@ def main():
     
     
     #env file path 
-    filepath = "./src/sample_maps/map4.txt"
+    filepath = "./src/sample_maps/map1.txt"
 
     # INIT RENDERING AND CONTROL
     controller = control.quad_control()
@@ -118,8 +118,8 @@ def main():
     
     map_array_scale = envi.get_map_array_scale()
     # print(map_array_scale)
-    start = [5*map_array_scale,13*map_array_scale,3*map_array_scale]
-    goal = [5*map_array_scale,7.5*map_array_scale,3*map_array_scale]
+    start = [5,17.5,2]
+    goal = [5,-3,3.5]
     rrt_st = rrt_star.RRT(envi,start,goal)
     path = rrt_st.RRT_star()
     envi.visualize_nodes(path) 
