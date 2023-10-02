@@ -10,6 +10,7 @@ class Environment:
         self.map_array_scale = 10
         self.bloat_amount = 0.1
         self.lowerboundary = None
+        self.upperboundary = None
 
     def make_env(self, bloat_amount=0.1):
         try:
@@ -29,6 +30,8 @@ class Environment:
                     boundary = [float(i) for i in words[1:7]]
                     self.lowerboundary = np.array(
                         [boundary[0], boundary[1], boundary[2]])
+                    self.upperboundary = np.array(
+                        [boundary[3], boundary[4], boundary[5]])
                     # Create the boundary cube
                     bpy.ops.mesh.primitive_cube_add(size=1, location=((boundary[0] + boundary[3]) / 2,
                                                                       (boundary[1] +
@@ -113,9 +116,9 @@ class Environment:
                     #         block_coords[5] + bloat_amount,
                     #     ]
 
-                    print("bloated coords", bloated_coords)
-                    print("bloated dimensions", bloated_dimensions)
-                    print("bloated location", bloated_location)
+                    # print("bloated coords", bloated_coords)
+                    # print("bloated dimensions", bloated_dimensions)
+                    # print("bloated location", bloated_location)
                     x_start, y_start, z_start, x_end, y_end, z_end = bloated_coords[0], bloated_coords[
                         1], bloated_coords[2], bloated_coords[3], bloated_coords[4], bloated_coords[5]
                     indices_start = convrule(
@@ -137,10 +140,10 @@ class Environment:
                         mat_name) or bpy.data.materials.new(name=mat_name)
                     mat.diffuse_color = (color[0], color[1], color[2], 1)
                     cube.data.materials.append(mat)
-        print("point in map array: ", self.map_array[100, 210, 35])
-        print("front idk: ", self.map_array[100, 200, 35])
-        print("bottom idk: ", self.map_array[0, 200, 10])
-        print("bottom back idk: ", self.map_array[0, 210, 10])
+        # print("point in map array: ", self.map_array[100, 210, 35])
+        # print("front idk: ", self.map_array[100, 200, 35])
+        # print("bottom idk: ", self.map_array[0, 200, 10])
+        # print("bottom back idk: ", self.map_array[0, 210, 10])
 
     def add_sphere(self, location, color, radius=0.3):
         # Adjust the location to Blender's coordinate system (if needed, not adjusting in this case)
@@ -200,6 +203,9 @@ class Environment:
 
     def get_lower_boundary(self):
         return self.lowerboundary
+    
+    def get_upper_boundary(self):
+        return self.upperboundary
 
 
 # # Usage

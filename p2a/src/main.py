@@ -118,6 +118,8 @@ def main():
     
     map_array_scale = envi.get_map_array_scale()
     # print(map_array_scale)
+#    start = [5,16,3]
+#    goal = [24,16,3]
     start = [5,17.5,2]
     goal = [5,-3,3.5]
     rrt_st = rrt_star.RRT(envi,start,goal)
