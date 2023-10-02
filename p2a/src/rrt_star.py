@@ -259,7 +259,7 @@ class RRT:
 
         return neighbors
 
-    def rewire(self, new_node, neighbors,tree_expansion_instance,user_sm):
+    def rewire(self, new_node, neighbors, tree_expansion_instance, user_sm):
         '''Rewire the new node and all its neighbors
         arguments:
             new_node - the new node
@@ -282,35 +282,6 @@ class RRT:
                             self.dis(new_node, neighbor)
                         # tree_expansion_instance.update_neighbor_connection(neighbor, new_node)
                         # img = user_sm.fetchLatestImage()
-
-
-    # def cubic_spline_interpolation(self, node1, node2, t):
-    #     # Compute the coefficients for the cubic spline equation
-    #     A = -2 * node1 + 2 * node2
-    #     B = 3 * node1 - 3 * node2
-    #     D = node1
-
-    #     return A * (t ** 3) + B * (t ** 2) + D
-
-    # def interpolate_path(self, path, num_points=10):
-    #     spline_path = []
-    #     for i in range(len(path) - 1):
-    #         start_node = path[i]
-    #         end_node = path[i + 1]
-
-    #         spline_path.append(start_node)
-
-    #         for j in range(1, num_points + 1):
-    #             t = j / (num_points + 1)
-    #             x = self.cubic_spline_interpolation(start_node.x, end_node.x, t)
-    #             y = self.cubic_spline_interpolation(start_node.y, end_node.y, t)
-    #             z = self.cubic_spline_interpolation(start_node.z, end_node.z, t)
-
-    #             interpolated_node = Node(x, y, z)
-    #             spline_path.append(interpolated_node)
-
-    #     spline_path.append(path[-1])
-    #     return spline_path
 
     def bspline_fitting(self, nodes, num_points=100, k=2):
         # Extract coordinates from nodes
@@ -414,7 +385,8 @@ class RRT:
                 # img = user_sm.fetchLatestImage()
             else:
                 continue
-            self.rewire(sample_node, neighbors, tree_expansion_instance, user_sm)
+            self.rewire(sample_node, neighbors,
+                        tree_expansion_instance, user_sm)
             # add sample node to list of vertices
             self.vertices.append(sample_node)
             # if a node is added to self.vertices, its corresponding val in map_array will be 2

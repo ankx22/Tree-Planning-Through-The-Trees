@@ -4,6 +4,7 @@ from helperfuncs import *
 import mathutils
 import math
 
+
 class Environment:
     def __init__(self, filepath) -> None:
         self.filepath = filepath
@@ -42,20 +43,24 @@ class Environment:
                     boundary_cube = bpy.context.object
                     boundary_cube.dimensions = [round(boundary[3] - boundary[0], 1), round(
                         boundary[4] - boundary[1], 1), round(boundary[5] - boundary[2], 1)]
-                    
+
                     # Get existing transparent material or create a new one
                     mat = bpy.data.materials.get("Transparent_Material")
                     if not mat:
-                        mat = bpy.data.materials.new(name="Transparent_Material")
+                        mat = bpy.data.materials.new(
+                            name="Transparent_Material")
                         mat.use_nodes = True
                         nodes = mat.node_tree.nodes
                         for node in nodes:
                             nodes.remove(node)
-                        transparent_bsdf = nodes.new(type='ShaderNodeBsdfTransparent')
-                        material_output = nodes.new(type='ShaderNodeOutputMaterial')
-                        mat.node_tree.links.new(transparent_bsdf.outputs["BSDF"], material_output.inputs["Surface"])
+                        transparent_bsdf = nodes.new(
+                            type='ShaderNodeBsdfTransparent')
+                        material_output = nodes.new(
+                            type='ShaderNodeOutputMaterial')
+                        mat.node_tree.links.new(
+                            transparent_bsdf.outputs["BSDF"], material_output.inputs["Surface"])
                         mat.blend_method = 'BLEND'
-                    
+
                     # Assign the material to the boundary_cube
                     boundary_cube.data.materials.append(mat)
 
@@ -147,7 +152,7 @@ class Environment:
                         x_start, y_start, z_start, boundary[0], boundary[1], boundary[2], self.map_array_scale, bloat_amount)
                     indices_end = convrule(
                         x_end, y_end, z_end, boundary[0], boundary[1], boundary[2], self.map_array_scale, bloat_amount)
-                    self.map_array[indices_start[0]:indices_end[0]+1, indices_start[1]:indices_end[1]+1, indices_start[2]:indices_end[2]+1] = 0  # 0 denotes obstacles
+                    self.map_array[indices_start[0]:indices_end[0]+1, indices_start[1]                                   :indices_end[1]+1, indices_start[2]:indices_end[2]+1] = 0  # 0 denotes obstacles
                     # self.map_array[int(self.map_array_scale*(x_start+0.1)):int(self.map_array_scale*(x_end+0.1))+1, int(self.map_array_scale*(y_start+5.1)):int(
                     #     self.map_array_scale*(y_end+5.1))+1, int(self.map_array_scale*(z_start+0.1)):int(self.map_array_scale*(z_end+0.1)+1)] = 0  # 0 denotes obstacles
                     # Create the block with bloated dimensions and adjusted location
@@ -217,7 +222,7 @@ class Environment:
     #     goal_color = (0, 0, 1, 1)  # Blue
     #     self.add_sphere(goal_node, goal_color)
 
-    def add_sphere(self, location, color, radius=0.15): #radius=0.6
+    def add_sphere(self, location, color, radius=0.15):  # radius=0.6
         # Adjust the location to Blender's coordinate system (if needed, not adjusting in this case)
         adjusted_location = (location[0], location[1], location[2])
 
@@ -268,26 +273,28 @@ class Environment:
         self.add_sphere(goal_node, goal_color)
         # self.connect_nodes_with_cylinder(goal_node,prev_node)
 
-
     def get_cylinder_name(self, node1, node2):
         return f"cylinder_{node1[0]}_{node1[1]}_{node1[2]}_to_{node2[0]}_{node2[1]}_{node2[2]}"
-  
+
     def connect_nodes_with_cylinder(self, node1, node2):
-        location, rotation_quaternion, scale, depth = self.compute_cylinder_transform(node1, node2)
-        bpy.ops.mesh.primitive_cylinder_add(radius=scale[0], depth=depth, location=location, rotation=rotation_quaternion.to_euler())
+        location, rotation_quaternion, scale, depth = self.compute_cylinder_transform(
+            node1, node2)
+        bpy.ops.mesh.primitive_cylinder_add(
+            radius=scale[0], depth=depth, location=location, rotation=rotation_quaternion.to_euler())
         cylinder = bpy.context.object
         cyl_name = self.get_cylinder_name(node1, node2)
         cylinder.name = cyl_name
         cylinder_color = (1, 1, 0, 1)  # Yellow
         mat_name = f"Cylinder_Material_{cylinder_color[0]}_{cylinder_color[1]}_{cylinder_color[2]}"
-        mat = bpy.data.materials.get(mat_name) or bpy.data.materials.new(name=mat_name)
+        mat = bpy.data.materials.get(
+            mat_name) or bpy.data.materials.new(name=mat_name)
         mat.diffuse_color = cylinder_color
         cylinder.data.materials.append(mat)
-  
+
     def compute_cylinder_transform(self, node1, node2):
-        point_start = [node1[0],node1[1],node1[2]]
-        point_end = [node2[0], node2[1],node2[2]]
-        
+        point_start = [node1[0], node1[1], node1[2]]
+        point_end = [node2[0], node2[1], node2[2]]
+
         location = [
             (point_start[0] + point_end[0]) / 2,
             (point_start[1] + point_end[1]) / 2,
@@ -299,22 +306,26 @@ class Environment:
             point_end[1] - point_start[1],
             point_end[2] - point_start[2],
         ]
-        
+
         length = np.linalg.norm(dir_vector)
         if length != 0:
             dir_vector = [x / length for x in dir_vector]
-            
-        axis = [0, 0, 1] # Default axis for quaternion calculation
-        angle = math.acos(max(-1.0, min(1.0, dir_vector[2]))) # to avoid values slightly out of range due to floating-point errors
-        
-        if (dir_vector[0], dir_vector[1]) != (0, 0): # if dir_vector is not parallel to z-axis
-            axis = [-dir_vector[1], dir_vector[0], 0] # perpendicular in the xy-plane
-            
+
+        axis = [0, 0, 1]  # Default axis for quaternion calculation
+        # to avoid values slightly out of range due to floating-point errors
+        angle = math.acos(max(-1.0, min(1.0, dir_vector[2])))
+
+        # if dir_vector is not parallel to z-axis
+        if (dir_vector[0], dir_vector[1]) != (0, 0):
+            # perpendicular in the xy-plane
+            axis = [-dir_vector[1], dir_vector[0], 0]
+
         rotation_quaternion = mathutils.Quaternion(axis, angle)
-        
+
         radius = 0.5  # Adjust the radius according to your need
-        scale = [radius, radius, length]  # Here, scale in z should be the length
-        
+        # Here, scale in z should be the length
+        scale = [radius, radius, length]
+
         return location, rotation_quaternion, scale, length
 
     def get_map_array(self):
@@ -328,7 +339,7 @@ class Environment:
 
     def get_lower_boundary(self):
         return self.lowerboundary
-    
+
     def get_upper_boundary(self):
         return self.upperboundary
 
