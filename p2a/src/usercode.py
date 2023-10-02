@@ -4,6 +4,7 @@ import bpy
 import os
 import scipy
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 class state_machine:
     def __init__(self):
@@ -89,7 +90,7 @@ class state_machine:
         # Adjust layout
         plt.tight_layout()
         # Show the plot
-        plt.show()
+        # plt.show()
 
 
         ####################################################################################################
@@ -188,15 +189,30 @@ class state_machine:
         print('user state machine terminted')
 
 
+    # def fetchLatestImage(self):
+    #     # Fetch image - renders the camera, saves the rendered image to a file and reads from it. 
+    #     path_dir = bpy.data.scenes["Scene"].node_tree.nodes["File Output"].base_path
+
+    #     # Render Drone Camera
+    #     cam = bpy.data.objects['DownCam']    
+    #     bpy.context.scene.camera = cam
+    #     bpy.context.scene.render.filepath = os.path.join(path_dir, 'DownCam_latest.png')
+    #     bpy.ops.render.render(write_still=True)
+
+    #     return cv2.imread(bpy.context.scene.render.filepath)
     def fetchLatestImage(self):
         # Fetch image - renders the camera, saves the rendered image to a file and reads from it. 
         path_dir = bpy.data.scenes["Scene"].node_tree.nodes["File Output"].base_path
-
-        # Render Drone Camera
-        cam = bpy.data.objects['DownCam']    
+        
+        # Render Camera
+        cam = bpy.data.objects['Camera.001']
         bpy.context.scene.camera = cam
-        bpy.context.scene.render.filepath = os.path.join(path_dir, 'DownCam_latest.png')
+        
+        # Append a unique timestamp to the file name to prevent overwriting previous images
+        timestamp_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        file_name = f'Camera001_{timestamp_str}.png'
+        bpy.context.scene.render.filepath = os.path.join(path_dir, file_name)
         bpy.ops.render.render(write_still=True)
-
+        
         return cv2.imread(bpy.context.scene.render.filepath)
     

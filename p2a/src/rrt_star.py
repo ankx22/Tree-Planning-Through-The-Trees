@@ -3,6 +3,9 @@
 # import matplotlib.pyplot as plt
 import numpy as np
 from helperfuncs import *
+from scipy.interpolate import make_interp_spline
+import tree_expansion as tr_exp
+import usercode
 
 # Class for each tree node
 
@@ -256,7 +259,7 @@ class RRT:
 
         return neighbors
 
-    def rewire(self, new_node, neighbors):
+    def rewire(self, new_node, neighbors,tree_expansion_instance,user_sm):
         '''Rewire the new node and all its neighbors
         arguments:
             new_node - the new node
@@ -277,6 +280,9 @@ class RRT:
                         neighbor.parent = new_node
                         neighbor.cost = new_node.cost + \
                             self.dis(new_node, neighbor)
+                        # tree_expansion_instance.update_neighbor_connection(neighbor, new_node)
+                        # img = user_sm.fetchLatestImage()
+
 
     # def cubic_spline_interpolation(self, node1, node2, t):
     #     # Compute the coefficients for the cubic spline equation
@@ -306,6 +312,26 @@ class RRT:
     #     spline_path.append(path[-1])
     #     return spline_path
 
+    def bspline_fitting(self, nodes, num_points=100, k=2):
+        # Extract coordinates from nodes
+        coordinates = np.array([[node.x, node.y, node.z] for node in nodes])
+
+        # Generate parameter values
+        t = np.linspace(0, 1, len(coordinates))
+
+        # Create the B-spline representation of the curve
+        tck = make_interp_spline(t, coordinates, k=k)
+
+        # Generate the smooth trajectory
+        u_new = np.linspace(0, 1, num_points)
+        trajectory_coordinates = tck(u_new)
+
+        # Create a list of Node objects for the trajectory
+        trajectory_nodes = [Node(x, y, z)
+                            for x, y, z in trajectory_coordinates]
+
+        return trajectory_nodes
+
     def RRT_star(self, n_pts=15000, neighbor_size=20):
         # if not seeing desired results correct the parameters: delta_q_star, goal_tolerance, best_dist threshold, neighbor_size, goal_tolerance, goal probability of self.get_new_point
         '''RRT* search function
@@ -318,6 +344,8 @@ class RRT:
         '''
         # Remove previous result
         self.init_map()
+        tree_expansion_instance = tr_exp.TreeExpansion()
+        user_sm = usercode.state_machine()
 
         ### YOUR CODE HERE ###
 
@@ -328,8 +356,8 @@ class RRT:
         # if added, rewire the node and its neighbors,
         # and check if reach the neighbor region of the goal if the path is not found.
         i = 1
-        for sample_number in range(n_pts):
-        # while not self.found:
+        # for sample_number in range(n_pts):
+        while not self.found:
             i += 1
             print(i)
             # print("Iteration: ", sample_number)
@@ -340,7 +368,6 @@ class RRT:
             # setting the incremental distance for moving from nearest vertex to random vertex (steering)
             delta_q_star = 0.2
             goal_tolerance = 0.5  # a node within this distance is considered close enough to the goal
-
             # get its nearest node to the random sample in the existing tree
             # nearest_node, best_dist = self.get_nearest_node(random_sample)
             # print(best_dist)
@@ -383,9 +410,11 @@ class RRT:
                 sample_node.parent = best_neighbor  # update the parent
                 sample_node.cost = best_neighbor.cost + \
                     self.dis(sample_node, best_neighbor)  # update cost
+                # tree_expansion_instance.add_and_connect_current_node(sample_node, best_neighbor)
+                # img = user_sm.fetchLatestImage()
             else:
                 continue
-            self.rewire(sample_node, neighbors)
+            self.rewire(sample_node, neighbors, tree_expansion_instance, user_sm)
             # add sample node to list of vertices
             self.vertices.append(sample_node)
             # if a node is added to self.vertices, its corresponding val in map_array will be 2
@@ -399,6 +428,8 @@ class RRT:
                 self.goal.parent = sample_node  # update goal parent
                 self.goal.cost = sample_node.cost + \
                     self.dis(sample_node, self.goal)  # update goal cost
+                # tree_expansion_instance.add_and_connect_current_node(sample_node, best_neighbor,True)
+                # img = user_sm.fetchLatestImage()
                 self.vertices.append(self.goal)  # ADDED THIS LINE
                 indices_goal = convrule(self.goal.x, self.goal.y, self.goal.z,
                                         self.lowerboundary[0], self.lowerboundary[1], self.lowerboundary[2], self.map_array_scale, self.bloat_amount)
@@ -429,6 +460,7 @@ class RRT:
             path.reverse()  # Reverse the list to print from start to goal
             # for node in path:
             # print(node)
+            # path = self.bspline_fitting(path)
 
             return path
             # path_interpolated = self.interpolate_path(path)

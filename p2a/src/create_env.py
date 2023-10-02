@@ -1,7 +1,8 @@
 import bpy
 import numpy as np
 from helperfuncs import *
-
+import mathutils
+import math
 
 class Environment:
     def __init__(self, filepath) -> None:
@@ -41,22 +42,43 @@ class Environment:
                     boundary_cube = bpy.context.object
                     boundary_cube.dimensions = [round(boundary[3] - boundary[0], 1), round(
                         boundary[4] - boundary[1], 1), round(boundary[5] - boundary[2], 1)]
+                    
+                    # Get existing transparent material or create a new one
+                    mat = bpy.data.materials.get("Transparent_Material")
+                    if not mat:
+                        mat = bpy.data.materials.new(name="Transparent_Material")
+                        mat.use_nodes = True
+                        nodes = mat.node_tree.nodes
+                        for node in nodes:
+                            nodes.remove(node)
+                        transparent_bsdf = nodes.new(type='ShaderNodeBsdfTransparent')
+                        material_output = nodes.new(type='ShaderNodeOutputMaterial')
+                        mat.node_tree.links.new(transparent_bsdf.outputs["BSDF"], material_output.inputs["Surface"])
+                        mat.blend_method = 'BLEND'
+                    
+                    # Assign the material to the boundary_cube
+                    boundary_cube.data.materials.append(mat)
 
                     # Subdivide the cube to create a grid effect
                     bpy.ops.object.mode_set(mode='EDIT')
                     bpy.ops.mesh.subdivide(number_cuts=10)
                     bpy.ops.object.mode_set(mode='OBJECT')
 
-                    # Shader setup for black color with alpha transparency of 0.344
-                    mat = bpy.data.materials.new(name="Grid_Material")
-                    mat.use_nodes = True
-                    nodes = mat.node_tree.nodes
-                    bsdf = nodes["Principled BSDF"]
-                    bsdf.inputs[0].default_value = (0, 0, 0, 0.344)
+                    # # Subdivide the cube to create a grid effect
+                    # bpy.ops.object.mode_set(mode='EDIT')
+                    # bpy.ops.mesh.subdivide(number_cuts=10)
+                    # bpy.ops.object.mode_set(mode='OBJECT')
 
-                    # Set blend mode to Alpha Blend
-                    mat.blend_method = 'BLEND'
-                    boundary_cube.data.materials.append(mat)
+                    # # Shader setup for black color with alpha transparency of 0.344
+                    # mat = bpy.data.materials.new(name="Grid_Material")
+                    # mat.use_nodes = True
+                    # nodes = mat.node_tree.nodes
+                    # bsdf = nodes["Principled BSDF"]
+                    # bsdf.inputs[0].default_value = (0, 0, 0, 0.344)
+
+                    # # Set blend mode to Alpha Blend
+                    # mat.blend_method = 'BLEND'
+                    # boundary_cube.data.materials.append(mat)
 
                     max_x, max_y, max_z = round(boundary[3]-boundary[0]+2*bloat_amount, 1), round(
                         boundary[4]-boundary[1]+2*bloat_amount, 1), round(boundary[5]-boundary[2]+2*bloat_amount, 1)
@@ -145,7 +167,54 @@ class Environment:
         # print("bottom idk: ", self.map_array[0, 200, 10])
         # print("bottom back idk: ", self.map_array[0, 210, 10])
 
-    def add_sphere(self, location, color, radius=0.3):
+    # def add_sphere(self, location, color, radius=0.3):
+    #     # Adjust the location to Blender's coordinate system (if needed, not adjusting in this case)
+    #     adjusted_location = (location[0], location[1], location[2])
+
+    #     # Create the sphere with specified location and radius
+    #     bpy.ops.mesh.primitive_uv_sphere_add(
+    #         radius=radius, location=adjusted_location)
+    #     sphere = bpy.context.object
+
+    #     # Color the sphere
+    #     mat_name = f"Material_{color[0]}_{color[1]}_{color[2]}"
+    #     mat = bpy.data.materials.get(
+    #         mat_name) or bpy.data.materials.new(name=mat_name)
+    #     mat.diffuse_color = color
+    #     sphere.data.materials.append(mat)
+
+    # def visualize_nodes(self, path):
+    #     # Define nodes and their colors
+    #     start_node = (
+    #         path[0].x,
+    #         path[0].y,
+    #         path[0].z
+    #     )
+    #     start_color = (1, 0, 0, 1)  # Red
+    #     self.add_sphere(start_node, start_color)
+
+    #     # Traverse through the intermediate nodes
+    #     for i in range(1, len(path) - 1):
+    #         # Get the actual Node object from the path list
+    #         intermediate_node = path[i]
+    #         intermediate = (
+    #             intermediate_node.x,
+    #             intermediate_node.y,
+    #             intermediate_node.z
+    #         )
+    #         intermediate_color = (0, 1, 0, 1)  # Green
+    #         self.add_sphere(intermediate, intermediate_color)
+
+    #     # Define the goal node and its color
+    #     goal_node = (
+    #         path[-1].x,
+    #         path[-1].y,
+    #         path[-1].z
+    #     )
+    #     goal_color = (0, 0, 1, 1)  # Blue
+    #     self.add_sphere(goal_node, goal_color)
+
+    def add_sphere(self, location, color, radius=0.6):
         # Adjust the location to Blender's coordinate system (if needed, not adjusting in this case)
         adjusted_location = (location[0], location[1], location[2])
 
@@ -170,6 +239,7 @@ class Environment:
         )
         start_color = (1, 0, 0, 1)  # Red
         self.add_sphere(start_node, start_color)
+        prev_node = (start_node[0], start_node[1], start_node[2])
 
         # Traverse through the intermediate nodes
         for i in range(1, len(path) - 1):
@@ -182,6 +252,8 @@ class Environment:
             )
             intermediate_color = (0, 1, 0, 1)  # Green
             self.add_sphere(intermediate, intermediate_color)
+            self.connect_nodes_with_cylinder(intermediate,prev_node)
+            prev_node = intermediate
 
         # Define the goal node and its color
         goal_node = (
@@ -191,6 +263,56 @@ class Environment:
         )
         goal_color = (0, 0, 1, 1)  # Blue
         self.add_sphere(goal_node, goal_color)
+        self.connect_nodes_with_cylinder(goal_node,prev_node)
+
+
+    def get_cylinder_name(self, node1, node2):
+        return f"cylinder_{node1[0]}_{node1[1]}_{node1[2]}_to_{node2[0]}_{node2[1]}_{node2[2]}"
+  
+    def connect_nodes_with_cylinder(self, node1, node2):
+        location, rotation_quaternion, scale, depth = self.compute_cylinder_transform(node1, node2)
+        bpy.ops.mesh.primitive_cylinder_add(radius=scale[0], depth=depth, location=location, rotation=rotation_quaternion.to_euler())
+        cylinder = bpy.context.object
+        cyl_name = self.get_cylinder_name(node1, node2)
+        cylinder.name = cyl_name
+        cylinder_color = (1, 1, 0, 1)  # Yellow
+        mat_name = f"Cylinder_Material_{cylinder_color[0]}_{cylinder_color[1]}_{cylinder_color[2]}"
+        mat = bpy.data.materials.get(mat_name) or bpy.data.materials.new(name=mat_name)
+        mat.diffuse_color = cylinder_color
+        cylinder.data.materials.append(mat)
+  
+    def compute_cylinder_transform(self, node1, node2):
+        point_start = [node1[0],node1[1],node1[2]]
+        point_end = [node2[0], node2[1],node2[2]]
+        
+        location = [
+            (point_start[0] + point_end[0]) / 2,
+            (point_start[1] + point_end[1]) / 2,
+            (point_start[2] + point_end[2]) / 2,
+        ]
+
+        dir_vector = [
+            point_end[0] - point_start[0],
+            point_end[1] - point_start[1],
+            point_end[2] - point_start[2],
+        ]
+        
+        length = np.linalg.norm(dir_vector)
+        if length != 0:
+            dir_vector = [x / length for x in dir_vector]
+            
+        axis = [0, 0, 1] # Default axis for quaternion calculation
+        angle = math.acos(max(-1.0, min(1.0, dir_vector[2]))) # to avoid values slightly out of range due to floating-point errors
+        
+        if (dir_vector[0], dir_vector[1]) != (0, 0): # if dir_vector is not parallel to z-axis
+            axis = [-dir_vector[1], dir_vector[0], 0] # perpendicular in the xy-plane
+            
+        rotation_quaternion = mathutils.Quaternion(axis, angle)
+        
+        radius = 0.5  # Adjust the radius according to your need
+        scale = [radius, radius, length]  # Here, scale in z should be the length
+        
+        return location, rotation_quaternion, scale, length
 
     def get_map_array(self):
         return self.map_array
