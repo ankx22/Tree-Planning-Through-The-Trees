@@ -372,8 +372,8 @@ class RRT:
             # nearest_node, best_dist = self.get_nearest_node(random_sample)
             # print(best_dist)
             best_dist = float('-inf')
-            while best_dist <= 0.2:
-                random_sample = self.get_new_point(0.01)  # get a new point
+            while best_dist <= 0.1:
+                random_sample = self.get_new_point(0.1)  # get a new point
                 nearest_node, best_dist = self.get_nearest_node(
                     random_sample)  # get its nearest node
             # create a node for the random sample generated
@@ -460,7 +460,7 @@ class RRT:
             path.reverse()  # Reverse the list to print from start to goal
             # for node in path:
             # print(node)
-            # path = self.bspline_fitting(path)
+            path = self.bspline_fitting(path)
 
             return path
             # path_interpolated = self.interpolate_path(path)

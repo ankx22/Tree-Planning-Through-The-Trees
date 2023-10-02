@@ -29,7 +29,7 @@ class TreeExpansion:
 
         if goal_achieved:
             # Create the sphere with specified location and radius
-            bpy.ops.mesh.primitive_uv_sphere_add(radius=0.4, location=adjusted_location)
+            bpy.ops.mesh.primitive_uv_sphere_add(radius=0.15, location=adjusted_location)
             sphere = bpy.context.object
 
         else:

@@ -87,7 +87,7 @@ class Environment:
 
                 elif words[0] == 'block':
                     block_coords = [float(i) for i in words[1:7]]
-                    color = [int(i)/255 for i in words[7:10]]
+                    color = [int(float(i))/255 for i in words[7:10]]
 
                     # x_start, y_start, z_start, x_end, y_end, z_end = map(int, block_coords)
                     # self.map_array[50*x_start:50*x_end, 50*y_start:50*y_end, 50*z_start:50*z_end] = 0  # 0 denotes obstacles
@@ -162,6 +162,9 @@ class Environment:
                         mat_name) or bpy.data.materials.new(name=mat_name)
                     mat.diffuse_color = (color[0], color[1], color[2], 1)
                     cube.data.materials.append(mat)
+        # a,b,c = 18.5,2.5,2
+        # indices = convrule(a, b, c, boundary[0], boundary[1], boundary[2], self.map_array_scale, bloat_amount)
+        # print(self.map_array[indices[0]][indices[1]][indices[2]])
         # print("point in map array: ", self.map_array[100, 210, 35])
         # print("front idk: ", self.map_array[100, 200, 35])
         # print("bottom idk: ", self.map_array[0, 200, 10])
@@ -214,7 +217,7 @@ class Environment:
     #     goal_color = (0, 0, 1, 1)  # Blue
     #     self.add_sphere(goal_node, goal_color)
 
-    def add_sphere(self, location, color, radius=0.6):
+    def add_sphere(self, location, color, radius=0.15): #radius=0.6
         # Adjust the location to Blender's coordinate system (if needed, not adjusting in this case)
         adjusted_location = (location[0], location[1], location[2])
 
@@ -252,7 +255,7 @@ class Environment:
             )
             intermediate_color = (0, 1, 0, 1)  # Green
             self.add_sphere(intermediate, intermediate_color)
-            self.connect_nodes_with_cylinder(intermediate,prev_node)
+            # self.connect_nodes_with_cylinder(intermediate,prev_node)
             prev_node = intermediate
 
         # Define the goal node and its color
@@ -263,7 +266,7 @@ class Environment:
         )
         goal_color = (0, 0, 1, 1)  # Blue
         self.add_sphere(goal_node, goal_color)
-        self.connect_nodes_with_cylinder(goal_node,prev_node)
+        # self.connect_nodes_with_cylinder(goal_node,prev_node)
 
 
     def get_cylinder_name(self, node1, node2):
