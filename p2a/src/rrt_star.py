@@ -338,7 +338,7 @@ class RRT:
 
             # setting the incremental distance for moving from nearest vertex to random vertex (steering)
             delta_q_star = 0.2
-            goal_tolerance = 0.5  # a node within this distance is considered close enough to the goal
+            goal_tolerance = 0.7  # a node within this distance is considered close enough to the goal
             # get its nearest node to the random sample in the existing tree
             # nearest_node, best_dist = self.get_nearest_node(random_sample)
             # print(best_dist)
@@ -432,7 +432,7 @@ class RRT:
             path.reverse()  # Reverse the list to print from start to goal
             # for node in path:
             # print(node)
-            path = self.bspline_fitting(path)
+            # path = self.bspline_fitting(path)
 
             return path
             # path_interpolated = self.interpolate_path(path)
@@ -441,3 +441,12 @@ class RRT:
         else:
             # print("No path found")
             return path
+        
+    def get_array(self,path):
+        path_array = np.zeros((len(path),3))
+        for i in range(len(path)):
+            nodes = path[i]
+            path_array[i,:] = np.array([nodes.x,nodes.y,nodes.z])
+
+            print("x,y,z is",nodes.x,nodes.y,nodes.z)
+        return path_array
