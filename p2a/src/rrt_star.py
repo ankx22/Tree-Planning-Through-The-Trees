@@ -283,26 +283,6 @@ class RRT:
                         # tree_expansion_instance.update_neighbor_connection(neighbor, new_node)
                         # img = user_sm.fetchLatestImage()
 
-    def bspline_fitting(self, nodes, num_points=100, k=2):
-        # Extract coordinates from nodes
-        coordinates = np.array([[node.x, node.y, node.z] for node in nodes])
-
-        # Generate parameter values
-        t = np.linspace(0, 1, len(coordinates))
-
-        # Create the B-spline representation of the curve
-        tck = make_interp_spline(t, coordinates, k=k)
-
-        # Generate the smooth trajectory
-        u_new = np.linspace(0, 1, num_points)
-        trajectory_coordinates = tck(u_new)
-
-        # Create a list of Node objects for the trajectory
-        trajectory_nodes = [Node(x, y, z)
-                            for x, y, z in trajectory_coordinates]
-
-        return trajectory_nodes
-
     def RRT_star(self, n_pts=15000, neighbor_size=20):
         # if not seeing desired results correct the parameters: delta_q_star, goal_tolerance, best_dist threshold, neighbor_size, goal_tolerance, goal probability of self.get_new_point
         '''RRT* search function

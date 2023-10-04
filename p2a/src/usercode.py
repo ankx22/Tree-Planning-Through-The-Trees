@@ -13,7 +13,7 @@ class state_machine:
 
         ### Motion Profile - sample code - EDIT HERE! ######################################################
         # For tuning the PID, utilize the following code. Once tuned, modify this section as you want! 
-        self.MP = np.genfromtxt('./src/sample_traj/MP.csv', delimiter=',', skip_header=0)
+        self.MP = np.genfromtxt('./src/sample_traj/trajnew.csv', delimiter=',', skip_header=0)
         # print(self.MP.shape)
         self.activeIndex = 0
         ####################################################################################################
@@ -31,15 +31,15 @@ class state_machine:
         vxdes = userstates['vx_des']
         vydes = userstates['vy_des']
         vzdes = userstates['vz_des']
-        # fig1 = plt.figure()
-        # ax = plt.axes(projection ='3d')
-        # # ax.plot3D(self.MP[0, :], self.MP[1, :],self.MP[2, :], 'green')
-        # ax.plot3D(xdes, ydes,zdes, 'green',label='desired')
-        # ax.plot3D(x,y,z,'red',label='actual')
-        # ax.set_title('3D trajectory visualization')
-        # ax.legend(loc='upper right')
-        # ax.grid(True)
-        # plt.show()
+        fig1 = plt.figure()
+        ax = plt.axes(projection ='3d')
+        # ax.plot3D(self.MP[0, :], self.MP[1, :],self.MP[2, :], 'green')
+        ax.plot3D(xdes, ydes,zdes, 'green',label='desired')
+        ax.plot3D(x,y,z,'red',label='actual')
+        ax.set_title('3D trajectory visualization')
+        ax.legend(loc='upper right')
+        ax.grid(True)
+        plt.show()
         #-------------------
         fig2, axs = plt.subplots(2, 3, figsize=(15, 8))
 
@@ -90,7 +90,7 @@ class state_machine:
         # Adjust layout
         plt.tight_layout()
         # Show the plot
-        # plt.show()
+        plt.show()
 
 
         ####################################################################################################
@@ -137,8 +137,8 @@ class state_machine:
         
         # FOLLOW GENERATED TRAJECTORY
         xyz_desired = self.MP[:3, self.activeIndex]
-        vel_desired = self.MP[3:6, self.activeIndex]
-        acc_desired = self.MP[6:, self.activeIndex]
+        vel_desired = self.MP[3:6, self.activeIndex]/500
+        acc_desired = self.MP[6:, self.activeIndex]/500
         yaw_setpoint = 0.0
 
         # PERFORM COLLISION CHECKING HERE

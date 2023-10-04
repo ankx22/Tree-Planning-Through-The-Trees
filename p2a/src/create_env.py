@@ -100,11 +100,11 @@ class Environment:
                     # Calculate the bloated dimensions
                     bloated_dimensions = [
                         round(
-                            (block_coords[3] - block_coords[0]) + 2 * bloat_amount, 1),
+                            (block_coords[3] - block_coords[0]), 1),
                         round(
-                            (block_coords[4] - block_coords[1]) + 2 * bloat_amount, 1),
+                            (block_coords[4] - block_coords[1]), 1),
                         round(
-                            (block_coords[5] - block_coords[2]) + 2 * bloat_amount, 1),
+                            (block_coords[5] - block_coords[2]), 1),
                     ]
 
                     # Adjust the location to account for the increased dimensions
@@ -322,7 +322,7 @@ class Environment:
 
         rotation_quaternion = mathutils.Quaternion(axis, angle)
 
-        radius = 0.5  # Adjust the radius according to your need
+        radius = 0.05  # Adjust the radius according to your need
         # Here, scale in z should be the length
         scale = [radius, radius, length]
 
