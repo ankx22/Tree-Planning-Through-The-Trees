@@ -20,36 +20,36 @@ On sample maps in blender:
 Watch the full simulation for sample map 1 [here](https://youtu.be/_bZi1fZofUs).
 
 <p float="middle">
-<img src="media/samplemap1.PNG" />
+<img src="p2a/media/samplemap1.PNG" />
 </p>
 
 <p float="middle">
-	<img src="media/samplemap1_frontview.gif" width="350" height="350" title="Front view"/>
-	<img src="media/samplemap1_sideview.gif" width="350" height="350" title="Side View"/>
+	<img src="p2a/media/samplemap1_frontview.gif" width="350" height="350" title="Front view"/>
+	<img src="p2a/media/samplemap1_sideview.gif" width="350" height="350" title="Side View"/>
 </p>
 
 ### Sample map 3:
 Watch the full simulation for sample map 3 [here](https://youtu.be/z33Q_nKZx80).
 
 <p float="middle">
-<img src="media/samplemap3.PNG" />
+<img src="p2a/media/samplemap3.PNG" />
 </p>
 
 <p float="middle">
-	<img src="media/samplemap3_frontview.gif" width="350" height="350" title="Front view"/> 
-	<img src="media/samplemap3_sideview.gif" width="350" height="350" title="Side View"/>
+	<img src="p2a/media/samplemap3_frontview.gif" width="350" height="350" title="Front view"/> 
+	<img src="p2a/media/samplemap3_sideview.gif" width="350" height="350" title="Side View"/>
 </p>
 
 ### Real map 1:
 Watch the full blender simulation for Real map 1 [here](https://youtu.be/L_uQLSAiuyI) and a test run on the real tello drone here ([link1](https://youtu.be/1HOdJ2UzKZM) and [link2](https://youtu.be/9xGu6nxwU6Q)).
 
 <p float="middle">
-<img src="media/realmap1.PNG" />
+<img src="p2a/media/realmap1.PNG" />
 </p>
 
 <p float="middle">
-	<img src="media/realmap1_frontview.gif" width="350" height="350" title="Front view"/> 
-	<img src="media/realmap1_sideview.gif" width="350" height="350" title="Side View"/>
+	<img src="p2a/media/realmap1_frontview.gif" width="350" height="350" title="Front view"/> 
+	<img src="p2a/media/realmap1_sideview.gif" width="350" height="350" title="Side View"/>
 </p>
 
 
