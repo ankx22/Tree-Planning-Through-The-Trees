@@ -3,13 +3,9 @@
 # import matplotlib.pyplot as plt
 import numpy as np
 from helperfuncs import *
-from scipy.interpolate import make_interp_spline
-import tree_expansion as tr_exp
-import usercode
+import blender_plots as bplt
 
 # Class for each tree node
-
-
 class Node:
     def __init__(self, x, y, z):
         self.x = x        # coordinate
@@ -42,7 +38,6 @@ class RRT:
         self.map_array_scale = envi.get_map_array_scale()
         self.lowerboundary = envi.get_lower_boundary()
         self.upperboundary = envi.get_upper_boundary()
-        # indices_ = convrule(x,y,z,self.lowerboundary[0],self.lowerboundary[1],self.lowerboundary[2],self.map_array_scale,self.bloat_amount)
 
     def init_map(self):
         '''Intialize the map before each search
@@ -50,8 +45,7 @@ class RRT:
         self.found = False
         self.vertices = []
         self.vertices.append(self.start)
-        indices = convrule(self.start.x, self.start.y, self.start.z,
-                           self.lowerboundary[0], self.lowerboundary[1], self.lowerboundary[2], self.map_array_scale, self.bloat_amount)
+        indices = convrule(self.start.x,self.start.y,self.start.z,self.lowerboundary[0],self.lowerboundary[1],self.lowerboundary[2],self.map_array_scale,self.bloat_amount)
         self.map_array[indices[0]][indices[1]][indices[2]] = 2
 
     def dis(self, node1, node2):
@@ -63,7 +57,6 @@ class RRT:
         return:
             euclidean distance between two nodes
         '''
-        ### YOUR CODE HERE ###
         return ((node1.x - node2.x)**2 + (node1.y-node2.y)**2 + (node1.z-node2.z)**2)**0.5
 
     def check_collision(self, node1, node2):
@@ -86,15 +79,12 @@ class RRT:
         sx = 0.1 if x2 > x1 else -0.1
         sy = 0.1 if y2 > y1 else -0.1
         sz = 0.1 if z2 > z1 else -0.1
-        # print("abs values x1,y1,z1", dx, dy, dz)
-        # print("x1, y1, z1:", x1, y1, z1)
-        # print("x2, y2, z2:", x2, y2, z2)
+        
         if dx >= dy and dx >= dz:
             err_1 = round(2*dy - dx, 1)
             err_2 = round(2*dz - dx, 1)
             while x1 != x2 or y1 != y2 or z1 != z2:
-                indices = convrule(
-                    x1, y1, z1, self.lowerboundary[0], self.lowerboundary[1], self.lowerboundary[2], self.map_array_scale, self.bloat_amount)
+                indices = convrule(x1,y1,z1,self.lowerboundary[0],self.lowerboundary[1],self.lowerboundary[2],self.map_array_scale,self.bloat_amount)
                 if not self.map_array[indices[0]][indices[1]][indices[2]]:
                     return False
                 if err_1 > 0:
@@ -111,8 +101,7 @@ class RRT:
             err_1 = round(2*dx - dy, 1)
             err_2 = round(2*dz - dy, 1)
             while x1 != x2 or y1 != y2 or z1 != z2:
-                indices = convrule(
-                    x1, y1, z1, self.lowerboundary[0], self.lowerboundary[1], self.lowerboundary[2], self.map_array_scale, self.bloat_amount)
+                indices = convrule(x1,y1,z1,self.lowerboundary[0],self.lowerboundary[1],self.lowerboundary[2],self.map_array_scale,self.bloat_amount)
                 if not self.map_array[indices[0]][indices[1]][indices[2]]:
                     return False
                 if err_1 > 0:
@@ -129,8 +118,7 @@ class RRT:
             err_1 = round(2*dy - dz, 1)
             err_2 = round(2*dx - dz, 1)
             while x1 != x2 or y1 != y2 or z1 != z2:
-                indices = convrule(
-                    x1, y1, z1, self.lowerboundary[0], self.lowerboundary[1], self.lowerboundary[2], self.map_array_scale, self.bloat_amount)
+                indices = convrule(x1,y1,z1,self.lowerboundary[0],self.lowerboundary[1],self.lowerboundary[2],self.map_array_scale,self.bloat_amount)
                 if not self.map_array[indices[0]][indices[1]][indices[2]]:
                     return False
                 if err_1 > 0:
@@ -154,18 +142,15 @@ class RRT:
         return:
             point - the new point
         '''
-        ### YOUR CODE HERE ###
         # generate a random number between 0 and 1
         rand_num = np.random.uniform(0, 1)
 
         if rand_num <= goal_bias:  # If the random number is less than goal bias
             return [self.goal.x, self.goal.y, self.goal.z]  # return goal
         else:
-            # return [np.random.randint(0,self.size_x),np.random.randint(0,self.size_y),np.random.randint(0,self.size_z)] #return a random point in map_array
-            return [round(np.random.uniform(self.lowerboundary[0], self.upperboundary[0]), 1),
-                    round(np.random.uniform(
-                        self.lowerboundary[1], self.upperboundary[1]), 1),
-                    round(np.random.uniform(self.lowerboundary[2], self.upperboundary[2]), 1)]  # return a random point in map_array
+            return [round(np.random.uniform(float(self.lowerboundary[0]), float(self.upperboundary[0])), 1),
+                    round(np.random.uniform(float(self.lowerboundary[1]), float(self.upperboundary[1])), 1),
+                    round(np.random.uniform(float(self.lowerboundary[2]),float(self.upperboundary[2])), 1)]  # return a random point in map_array
 
     def get_nearest_node(self, point):
         '''Find the nearest node in self.vertices with respect to the new point
@@ -175,7 +160,6 @@ class RRT:
         return:
             the nearest node
         '''
-        ### YOUR CODE HERE ###
         # initialize the first node in self.vertices to be the nearest node
         nearest_node = self.vertices[0]
         # make the point into a node
@@ -228,15 +212,10 @@ class RRT:
             vec_y = round(delta_q * (delta_y / node_dist), 1)
             vec_z = round(delta_q * (delta_z / node_dist), 1)
 
-            # print("Division: ", vec_x, vec_y, vec_z)
-            # vec_x = delta_q*int((x2-x1)/node_dist)
-            # vec_y = delta_q*int((y2-y1)/node_dist)
-            # vec_z = delta_q*int((z2-z1)/node_dist)
             # Calculate the new coordinates of the node after steering towards the random node
             steered_x = round(x1 + vec_x, 1)
             steered_y = round(y1 + vec_y, 1)
             steered_z = round(z1 + vec_z, 1)
-            # print("steered x y z: ", steered_x, steered_y, steered_z)
             # Create a new node with the steered coordinates and return it
             steered_node = Node(steered_x, steered_y, steered_z)
             return steered_node
@@ -250,7 +229,6 @@ class RRT:
         return:
             neighbors - a list of neighbors that are within the neighbor distance 
         '''
-        ### YOUR CODE HERE ###
         neighbors = []
 
         for vertex in self.vertices:
@@ -259,7 +237,7 @@ class RRT:
 
         return neighbors
 
-    def rewire(self, new_node, neighbors, tree_expansion_instance, user_sm):
+    def rewire(self, new_node, neighbors):
         '''Rewire the new node and all its neighbors
         arguments:
             new_node - the new node
@@ -268,7 +246,6 @@ class RRT:
         Rewire the new node if connecting to a new neighbor node will give least cost.
         Rewire all the other neighbor nodes.
         '''
-        ### YOUR CODE HERE ###
 
         for neighbor in neighbors:
             # don't consider the parent of new node to rewire
@@ -280,10 +257,9 @@ class RRT:
                         neighbor.parent = new_node
                         neighbor.cost = new_node.cost + \
                             self.dis(new_node, neighbor)
-                        # tree_expansion_instance.update_neighbor_connection(neighbor, new_node)
-                        # img = user_sm.fetchLatestImage()
 
-    def RRT_star(self, n_pts=15000, neighbor_size=20):
+
+    def RRT_star(self, n_pts=20000, neighbor_size=20):#prev 20000
         # if not seeing desired results correct the parameters: delta_q_star, goal_tolerance, best_dist threshold, neighbor_size, goal_tolerance, goal probability of self.get_new_point
         '''RRT* search function
         arguments:
@@ -295,52 +271,37 @@ class RRT:
         '''
         # Remove previous result
         self.init_map()
-        tree_expansion_instance = tr_exp.TreeExpansion()
-        user_sm = usercode.state_machine()
-
-        ### YOUR CODE HERE ###
+        
 
         # In each step,
         # get a new point,
         # get its nearest node,
-        # extend the node and check ylision to decide whether to add or drop,
+        # extend the node and check collision to decide whether to add or drop,
         # if added, rewire the node and its neighbors,
         # and check if reach the neighbor region of the goal if the path is not found.
-        i = 1
-        # for sample_number in range(n_pts):
-        while not self.found:
-            i += 1
-            print(i)
-            # print("Iteration: ", sample_number)
-            # random_sample = self.get_new_point(0.01)  # get a new point
-            # print("random sample: ", random_sample)
-            # print("start x y z: ", self.start.x,self.start.y,self.start.z)
 
+        for sample_number in range(n_pts):
+        # while not self.found:
+        
             # setting the incremental distance for moving from nearest vertex to random vertex (steering)
-            delta_q_star = 0.2
-            goal_tolerance = 0.7  # a node within this distance is considered close enough to the goal
+            delta_q_star = 0.2#0.2
+            goal_tolerance = 1#1  # a node within this distance is considered close enough to the goal
+
             # get its nearest node to the random sample in the existing tree
-            # nearest_node, best_dist = self.get_nearest_node(random_sample)
-            # print(best_dist)
             best_dist = float('-inf')
-            while best_dist <= 0.1:
-                random_sample = self.get_new_point(0.1)  # get a new point
+            while best_dist <= 0.1:#0.1
+                random_sample = self.get_new_point(0.01)  # get a new point 0.01
                 nearest_node, best_dist = self.get_nearest_node(
                     random_sample)  # get its nearest node
             # create a node for the random sample generated
             random_node = Node(
                 random_sample[0], random_sample[1], random_sample[2])
-            # print("Nearest Node x y z: ", nearest_node.x,
-            #   nearest_node.y, nearest_node.z)
+            
             # steer towards the random node and return the corresponding node
             sample_node = self.steer(random_node, nearest_node, delta_q_star)
-            # print("sample node x y z: ", sample_node.x,
-            #   sample_node.y, sample_node.z)
 
-            # for i in self.vertices: print(i)
-            # print("\n")
-            indices_sample = convrule(sample_node.x, sample_node.y, sample_node.z,
-                                      self.lowerboundary[0], self.lowerboundary[1], self.lowerboundary[2], self.map_array_scale, self.bloat_amount)
+            # Convert the node to real world coordinates
+            indices_sample = convrule(sample_node.x,sample_node.y,sample_node.z,self.lowerboundary[0],self.lowerboundary[1],self.lowerboundary[2],self.map_array_scale,self.bloat_amount)
 
             if (self.map_array[indices_sample[0]][indices_sample[1]][indices_sample[2]] == 0 or self.map_array[indices_sample[0]][indices_sample[1]][indices_sample[2]] == 2):
                 continue  # if the sample is in an obstacle or self.vertices
@@ -361,48 +322,34 @@ class RRT:
                 sample_node.parent = best_neighbor  # update the parent
                 sample_node.cost = best_neighbor.cost + \
                     self.dis(sample_node, best_neighbor)  # update cost
-                # tree_expansion_instance.add_and_connect_current_node(sample_node, best_neighbor)
-                # img = user_sm.fetchLatestImage()
             else:
                 continue
-            self.rewire(sample_node, neighbors,
-                        tree_expansion_instance, user_sm)
+            self.rewire(sample_node, neighbors)
             # add sample node to list of vertices
             self.vertices.append(sample_node)
             # if a node is added to self.vertices, its corresponding val in map_array will be 2
-            indices_sample = convrule(sample_node.x, sample_node.y, sample_node.z,
-                                      self.lowerboundary[0], self.lowerboundary[1], self.lowerboundary[2], self.map_array_scale, self.bloat_amount)
-            self.map_array[indices_sample[0]
-                           ][indices_sample[1]][indices_sample[2]] = 2
+            indices_sample = convrule(sample_node.x,sample_node.y,sample_node.z,self.lowerboundary[0],self.lowerboundary[1],self.lowerboundary[2],self.map_array_scale,self.bloat_amount)
+            self.map_array[indices_sample[0]][indices_sample[1]][indices_sample[2]] = 2
+
             # if sample node is close enough to goal  and (not self.found)
             if (self.dis(sample_node, self.goal) < goal_tolerance and (not self.found)):
                 self.found = True
+                print("Found one path")
                 self.goal.parent = sample_node  # update goal parent
                 self.goal.cost = sample_node.cost + \
                     self.dis(sample_node, self.goal)  # update goal cost
-                # tree_expansion_instance.add_and_connect_current_node(sample_node, best_neighbor,True)
-                # img = user_sm.fetchLatestImage()
-                self.vertices.append(self.goal)  # ADDED THIS LINE
-                indices_goal = convrule(self.goal.x, self.goal.y, self.goal.z,
-                                        self.lowerboundary[0], self.lowerboundary[1], self.lowerboundary[2], self.map_array_scale, self.bloat_amount)
-                self.map_array[indices_goal[0]
-                               ][indices_goal[1]][indices_goal[2]] = 2
+                self.vertices.append(self.goal)  # Add goal to all the vertices tree
+                indices_goal = convrule(self.goal.x,self.goal.y,self.goal.z,self.lowerboundary[0],self.lowerboundary[1],self.lowerboundary[2],self.map_array_scale,self.bloat_amount)
+                self.map_array[indices_goal[0]][indices_goal[1]][indices_goal[2]] = 2
                 # keep iterating and optimizing the current path even after goal is found in RRT*
 
         path = []
 
         # Output
         if self.found:
-            # self.vertices.append(self.goal)#ADDED THIS LINE
-            # self.map_array[self.goal.x][self.goal.y][self.goal.z] = 2
-            # self.vertices.append(self.goal) #add goal to vertices list after the desired number of iterations
+            
             steps = len(self.vertices) - 2
             length = self.goal.cost
-            for i in self.vertices:
-                print(i)
-            print("\n")
-            print("It took %d nodes to find the current path" % steps)
-            print("The path length is %.2f" % length)
 
             current_node = self.goal
             while current_node is not None:  # Traverse from the goal node to the start node
@@ -410,18 +357,20 @@ class RRT:
                 current_node = current_node.parent  # move to the parent node
 
             path.reverse()  # Reverse the list to print from start to goal
-            # for node in path:
-            # print(node)
-            # path = self.bspline_fitting(path)
 
+            path_array = np.zeros((len(path),3))
+            for i in range(len(path)):
+                nodes = path[i]
+                path_array[i,:] = np.array([nodes.x,nodes.y,nodes.z])
+
+                print("x,y,z is",nodes.x,nodes.y,nodes.z)
+            
             return path
-            # path_interpolated = self.interpolate_path(path)
-            # return path_interpolated
 
         else:
-            # print("No path found")
+            print("No path found")
             return path
-        
+
     def get_array(self,path):
         path_array = np.zeros((len(path),3))
         for i in range(len(path)):
@@ -430,3 +379,7 @@ class RRT:
 
             print("x,y,z is",nodes.x,nodes.y,nodes.z)
         return path_array
+
+    def get_vertices(self):
+        return self.vertices
+

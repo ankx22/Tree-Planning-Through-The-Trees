@@ -3,7 +3,6 @@ import math
 from pyquaternion import Quaternion
 from numpy.linalg import norm
 import scipy
-from scipy import io
 
 class quad_control:
     def __init__(self):
@@ -29,17 +28,14 @@ class quad_control:
         self.minRate = -self.maxRate
         minAct = -maxAct
         
-        # EDIT PID GAINS HERE! (kp, ki, kd, filter_tau, dt, dim = 1, minVal = -1, maxVal = 1)
-        # NED position controller. EDIT GAINS HERE
-        self.x_pid = pid(1.2, 0.55, 0.05, filter_tau, dt, minVal = minVel, maxVal=maxVel)
-        self.y_pid = pid(1.2, 0.55, 0.5, filter_tau, dt, minVal = minVel, maxVal=maxVel)
-        self.z_pid = pid(2.5, 0.7, 0.5, filter_tau, dt, minVal = minVel, maxVal=maxVel)
-        #--------------------------------------------------------------------------------------
+        
 
-        # NED velocity controller. EDIT GAINS HERE
-        self.vx_pid = pid(1.5, 0.00, 0.15, filter_tau, dt, minVal = minAcc, maxVal=maxAcc)
-        self.vy_pid = pid(1.5, 0.08, 0.01, filter_tau, dt, minVal = minAcc, maxVal=maxAcc)
-        self.vz_pid = pid(4.05, 0.002, 0.1, filter_tau, dt, minVal = minAcc, maxVal = maxAcc)
+        self.x_pid = pid(0.1, 0., 0., filter_tau, dt, minVal = minVel, maxVal=maxVel) # best PID Gains on all maps
+        self.y_pid = pid(0.1, 0., 0., filter_tau, dt, minVal = minVel, maxVal=maxVel)
+        self.z_pid = pid(0.01, 0., 0., filter_tau, dt, minVal = minVel, maxVal=maxVel)
+        self.vx_pid = pid(2, 0.00, 0.1, filter_tau, dt, minVal = minAcc, maxVal=maxAcc)
+        self.vy_pid = pid(2, 0., 0, filter_tau, dt, minVal = minAcc, maxVal=maxAcc)
+        self.vz_pid = pid(20, 0.01, 0.1, filter_tau, dt, minVal = minAcc, maxVal = maxAcc)
         
         # Quaternion based P Controller. Output is desired angular rate. tau is time constant of closed loop
         self.tau_angle = 0.3
@@ -176,8 +172,7 @@ class quad_control:
         loggedDict = {'control_time': self.timeArray,
                   'control_premix': self.controlArray}
         
-        # scipy.io.savemat('./log/control.mat', loggedDict)
-        io.savemat('./log/control.mat', loggedDict)
+        scipy.io.savemat('./log/control.mat', loggedDict)
 
 
         return U

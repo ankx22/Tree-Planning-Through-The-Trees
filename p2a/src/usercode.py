@@ -13,10 +13,13 @@ class state_machine:
 
         ### Motion Profile - sample code - EDIT HERE! ######################################################
         # For tuning the PID, utilize the following code. Once tuned, modify this section as you want! 
+        # self.MP = np.genfromtxt('./src/sample_traj/MP.csv', delimiter=',', skip_header=0)
         self.MP = np.genfromtxt('./src/sample_traj/trajnew.csv', delimiter=',', skip_header=0)
-        # print(self.MP.shape)
+        # zero =np.array([0,0,0,0,0,0,0,0,0])
+        # self.MP = np.concatenate((zero,self.MP),axis=0)
+        print("shape of new traj is11,",self.MP.shape)
         self.activeIndex = 0
-        ####################################################################################################
+
         userstates = scipy.io.loadmat('./log/user_states.mat')
         t = userstates['time']
         x = userstates['x']
@@ -91,9 +94,8 @@ class state_machine:
         plt.tight_layout()
         # Show the plot
         plt.show()
-
-
         ####################################################################################################
+
 
         # Logger
         self.time_array = 0
@@ -132,22 +134,33 @@ class state_machine:
 
 
         """
-
+        # print("time is",time)
         # EDIT HERE ###########################################################################################
         
         # FOLLOW GENERATED TRAJECTORY
+        # print(self.MP.shape)
+        # x = 0.002*time**3+0.2*time**2+time+1
+        # y = 0.001*time**3+0.3*time**2+2*time+2
+        # z = 0.002*time**3+0.3*time**2+2*time+2
+        # vx = 0.006*time**2+0.4*time+1
+        # vy = 0.003*time**2+0.6*time+2
+        # vz = 0.006*time**2+0.6*time+2
+        # ax = 0.012*time+0.4
+        # ay = 0.006*time+0.6
+        # az = 0.012*time+0.6
+        # xyz_desired = np.array([x,y,z])
+        # vel_desired = np.array([vx,vy,vz])
+        # acc_desired = np.array([ax,ay,az])
+        # print(self.MP[:3, self.activeIndex])
         xyz_desired = self.MP[:3, self.activeIndex]
-        vel_desired = self.MP[3:6, self.activeIndex]/500
-        acc_desired = self.MP[6:, self.activeIndex]/500
-        yaw_setpoint = 0.0
+        vel_desired = self.MP[4:7, self.activeIndex]
+        acc_desired = self.MP[8:11, self.activeIndex]
+        yaw_setpoint = 0.0  # Set this to self.MP[3,self.activeIndex] if yaw control is needed
+        # print(self.MP[7,self.activeIndex])#yaw speed
+        # print(self.activeIndex)
+        
 
-        # PERFORM COLLISION CHECKING HERE
-        # collision = coll_check(...)
-        # if collision:
-        #     print('Robot has collided')
-        #     exit(0)
-
-        if self.activeIndex<len(self.MP[1, :]):
+        if self.activeIndex<len(self.MP[1, :])-1:
             self.activeIndex = self.activeIndex+1
         
         #######################################################################################################
@@ -189,22 +202,22 @@ class state_machine:
         print('user state machine terminted')
 
 
-    # def fetchLatestImage(self):
-    #     # Fetch image - renders the camera, saves the rendered image to a file and reads from it. 
-    #     path_dir = bpy.data.scenes["Scene"].node_tree.nodes["File Output"].base_path
-
-    #     # Render Drone Camera
-    #     cam = bpy.data.objects['DownCam']    
-    #     bpy.context.scene.camera = cam
-    #     bpy.context.scene.render.filepath = os.path.join(path_dir, 'DownCam_latest.png')
-    #     bpy.ops.render.render(write_still=True)
-
-    #     return cv2.imread(bpy.context.scene.render.filepath)
     def fetchLatestImage(self):
+        # # Fetch image - renders the camera, saves the rendered image to a file and reads from it. 
+        # path_dir = bpy.data.scenes["Scene"].node_tree.nodes["File Output"].base_path
+
+        # # Render Drone Camera
+        # cam = bpy.data.objects['DownCam']    
+        # bpy.context.scene.camera = cam
+        # bpy.context.scene.render.filepath = os.path.join(path_dir, 'DownCam_latest.png')
+        # bpy.ops.render.render(write_still=True)
+
+        # return cv2.imread(bpy.context.scene.render.filepath)
+        #----------------------------------------------------------------------------
         # Fetch image - renders the camera, saves the rendered image to a file and reads from it. 
         path_dir = bpy.data.scenes["Scene"].node_tree.nodes["File Output"].base_path
         
-        # Render Camera
+        # Render Drone Camera
         cam = bpy.data.objects['Camera.001']
         bpy.context.scene.camera = cam
         

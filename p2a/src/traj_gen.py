@@ -9,7 +9,7 @@ class traj_gen:
     # Constructor
     def __init__(self, envi,waypoints):
         self.waypoints = waypoints
-        num_wps,point_size = waypoints.shape #no of pooints,3
+        num_wps,point_size = waypoints.shape #no of points,3
         self.num_wps = num_wps
         self.point_size = point_size
         self.order = 3 # Quintic for minimum jerk path 2*3-1
@@ -202,5 +202,5 @@ class traj_gen:
 
 #     print(traj.get_Amat().shape)
 
-# if __name__ == "_main_":
+# if __name__ == "__main__":
 #     main()
