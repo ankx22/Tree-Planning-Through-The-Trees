@@ -13,7 +13,7 @@ In this project a RRT* path planning and minimum snap trajectory generation (mot
    	- Once the script is run press `spacebar` to run the simulation in layout tab.
 
 ## Report
-For detailed description see the report [here](Report.pdf).
+For detailed description see the report [here](https://github.com/ankx22/Fly-through-real-trees-/blob/main/Report.pdf).
 ## Plots and Animations
 On sample maps in blender:
 ### Sample map 1:
